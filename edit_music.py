@@ -9,6 +9,8 @@ import os
 """
 编辑音乐
 """
+
+# 裁剪音乐
 def clip_music(filename,savename,star,end):
     """
     裁剪wav音乐
@@ -24,7 +26,7 @@ def clip_music(filename,savename,star,end):
     except Exception as msg:
         print(msg)
 
-
+# 裁剪歌词
 def clip_lrc(filename,star,end):
     """
     裁剪歌词
@@ -64,7 +66,25 @@ def clip_lrc(filename,star,end):
         print(key,Dict[key])
     return cliplrcs
 
+# 将歌词文件写入词云文件
+def write_to_file(lrcfile,start,end,writefile):
+    """
+    将歌词片段写入txt
+    :param lrcfile:歌词文件路径
+    :param start:歌曲开始时间
+    :param end:歌曲结束时间
+    :param writefile:写入文件路径txt
+    :return:
+    """
+    lrc = clip_lrc(lrcfile, start, end)
+    with open(writefile, 'a', encoding='utf-8') as f:
+        for mes in lrc:
+            f.write(mes)
+        f.close()
+    print(lrc)
+
 if __name__ == '__main__':
     # clip_music("wavfile/antique_music/0.wav","clip.wav",60,120)
-    lrc = clip_lrc("lrcfile/1354477202.txt",30,60)
-    print(lrc)
+    lrcfile = "lrcfile/239164.txt"
+    writefile = "source/ciyun.txt"
+    write_to_file(lrcfile,0,1000,writefile)

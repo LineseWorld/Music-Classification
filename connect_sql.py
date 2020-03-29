@@ -2,6 +2,7 @@ import pymysql
 import pandas as pd
 from sqlalchemy import create_engine
 class SQL():
+    # 初始化信息
     def __init__(self):
         # 使用 connect 方法，传入数据库地址，账号密码，数据库名就可以得到你的数据库对象
         self.address = "localhost"
@@ -9,7 +10,13 @@ class SQL():
         self.password = "lsj123"
         self.db_name = "graduation"
 
+    # 插入歌曲
     def insert_song(self, values):
+        """
+        插入歌曲
+        :param values:sid,sname,sauthor,slrc,surl
+        :return:
+        """
         db = pymysql.connect(self.address, self.user, self.password, self.db_name,charset='utf8')
         # 插入一条记录
         ss = "("
@@ -29,7 +36,13 @@ class SQL():
         print("成功插入数据")
         db.close()
 
+    # 插入记录
     def insert_recoder(self, values):
+        """
+        插入用户数据
+        :param values:uid,sid,tag,st,et,ts,me
+        :return:
+        """
         db = pymysql.connect(self.address, self.user, self.password, self.db_name,charset='utf8')
         # 插入一条记录
         ss = "("
@@ -46,14 +59,15 @@ class SQL():
         cursor = db.cursor()
         cursor.execute(sql)
         db.commit()
-        print("成功插入数据")
+        print("成功用户行为插入数据")
         db.close()
 
+    # 获取记录
     def get_recoder_byUid(self,uid):
         """
         返回uid用户的recoder数据
-        :param uid:
-        :return:
+        :param uid:user_id
+        :return: pandas 类型
         """
         engine =pymysql.connect(self.address, self.user, self.password, self.db_name,charset='utf8')
         sql = "select * from recoder where user_id="+"\'"+str(uid)+"\'"
