@@ -10,8 +10,8 @@ from scipy.io import wavfile
 from tqdm import tqdm
 import librosa
 from sklearn import svm
-from sklearn.externals import joblib
 
+import joblib
 """
 实现音乐分类器
 """
@@ -26,8 +26,10 @@ def mp3_to_wav(file_name,save_name):
     try:
         sound = AudioSegment.from_mp3(file_name)
         sound.export(save_name,format ='wav')
+        return True
     except Exception as msg:
         print(msg)
+        return False
 
 # 得到mfcc特征变换向量
 def get_mfcc_feature(path):
@@ -47,6 +49,7 @@ def get_mfcc_feature(path):
             result = np.append(result,np.diag(mc,i))
         return result
     except Exception as msg:
+
         print(msg)
 
 # 将列表写入本地

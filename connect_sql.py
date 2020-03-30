@@ -69,14 +69,29 @@ class SQL():
         :param uid:user_id
         :return: pandas 类型
         """
-        engine =pymysql.connect(self.address, self.user, self.password, self.db_name,charset='utf8')
+        db =pymysql.connect(self.address, self.user, self.password, self.db_name,charset='utf8')
         sql = "select * from recoder where user_id="+"\'"+str(uid)+"\'"
-        result = pd.read_sql_query(sql,con=engine)
+        result = pd.read_sql_query(sql,con=db)
         # print(result)
         return result
 
+    # 判断歌曲库中是否存在
+    def judgesong(self,song_id):
+        db = pymysql.connect(self.address, self.user, self.password, self.db_name, charset='utf8')
+        sql = "select 1 from songs where song_id = \'"+str(song_id)+"\' limit 1;"
+        cursor = db.cursor()
+        try:
+            # 执行SQL语句
+            cursor.execute(sql)
+            # 获取所有记录列表
+            results = cursor.fetchone()
+            return results
+        except:
+            print("Error: unable to fecth data")
+        # 关闭数据库连接
+        db.close()
 
 if __name__ == '__main__':
     sql = SQL()
-    sql.get_recoder_byUid(393361316)
+    print(sql.judgesong("1231"))
 

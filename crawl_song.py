@@ -55,7 +55,7 @@ def download_musiclist(Songs,filename,start,n):
             break
 
 # 批量下载歌单歌词
-def download_lrc(Songs):
+def download_lrcs(Songs):
     """
     下载歌词
     :param Songs:
@@ -69,6 +69,17 @@ def download_lrc(Songs):
         with open(file_name,'w',encoding='utf-8') as file:
             file.write(lrc)
             file.close()
+
+def download_lrc(file_name,song_id):
+    """
+    下载歌词
+    :param song_id:
+    :return:
+    """
+    lrc = get_lrc(song_id)
+    with open(file_name,'w',encoding='utf-8') as file:
+        file.write(lrc)
+        file.close()
 
 # 判断是否拥有mp3版权
 def judge_song_url(song_id):
@@ -133,14 +144,16 @@ def download_song(save_name,song_id):
     """
     if judge_song_url(song_id)==False:
         print("无歌曲版权")
+        return False
     else:
         song_url="http://music.163.com/song/media/outer/url?id="+str(song_id)+".mp3"
         res = requests.get(song_url, headers=headers)
         music = res.content
-        with open(file_name, 'wb') as file:
+        with open(save_name, 'wb') as file:
             file.write(music)
             file.flush()
             file.close()
+        return True
 
 # 计算文件数量
 def count_files(path):
