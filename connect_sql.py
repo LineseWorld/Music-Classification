@@ -75,6 +75,22 @@ class SQL():
         # print(result)
         return result
 
+    def get_songtabel(self):
+        db = pymysql.connect(self.address, self.user, self.password, self.db_name, charset='utf8')
+        sql = "select song_id from songs ;"
+        cursor = db.cursor()
+        try:
+            # 执行SQL语句
+            cursor.execute(sql)
+            # 获取所有记录列表
+            results = cursor.fetchall()
+            return results
+        except:
+            print("Error: unable to fecth data")
+        # 关闭数据库连接
+        db.close()
+
+
     # 判断歌曲库中是否存在
     def judgesong(self,song_id):
         db = pymysql.connect(self.address, self.user, self.password, self.db_name, charset='utf8')
@@ -93,5 +109,5 @@ class SQL():
 
 if __name__ == '__main__':
     sql = SQL()
-    print(sql.judgesong("1231"))
+    print(sql.get_songtabel())
 

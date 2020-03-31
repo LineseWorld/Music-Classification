@@ -4,27 +4,10 @@ import joblib
 from tqdm import tqdm
 # uid = 393361316
 
-def get_musicclass(song_id,tag,start_time,end_time):
-    save_name = "test.mp3"
-    print("下载歌曲中...")
-    crawl_song.download_song(save_name,song_id)
-    print("下载完成")
-    save_wav = "test.wav"
-    print("类型转换...")
-    fg = music_classify.mp3_to_wav(save_name,save_wav)
-    if fg == True:
-        print("类型转换成功")
-    else:
-        print("暂无版权或者需要vip特权")
-        return None
-    if tag == 2:
-        print("裁剪wav....")
-        edit_music.clip_music(save_wav,save_wav,start_time,end_time)
-        print("裁剪wav成功")
-    x_predict = []
-    print("获取特征....")
-    x_predict.append( music_classify.get_mfcc_feature(save_wav))
-    print("获得特征")
+def get_musicclass(song_id):
+
+    mfcc_file =  "E:\\musiclib\\mfcc\\"+str(song_id)+".txt"
+    x_predict = music_classify.Read_list_x(mfcc_file)
     print("加载分类器")
     estimator = joblib.load("music_clf.pkl")
     print("加载完成")
@@ -62,6 +45,26 @@ def download_user_music(user_id):
             sql.insert_song([song_id,'name','author','song_lrc','song_url'])
     print("cnt:",cnt)
 
+def save_mfcc(song_id):
+    target_wav = "E:\\musiclib\\wav\\"+str(song_id)+".wav"
+    save_file  = "E:\\musiclib\\mfcc\\"+str(song_id)+".txt"
+    if music_classify.judge_exist(save_file):
+        print("已存在，不必进行特征转换")
+        return
+    x_predict = []
+    x_predict.append(music_classify.get_mfcc_feature(target_wav))
+    music_classify.Save_list(x_predict,save_file)
+
+
+def save_predict(song_id):
+    save_file = "E:\\musiclib\\predict\\" + str(song_id) + ".txt"
+    if music_classify.judge_exist(save_file):
+        print("已存在，不必进行特征转换")
+        return
+    y_predict = []
+    y_predict.append(get_musicclass(song_id))
+    music_classify.Save_list(y_predict, save_file)
+
 if __name__ == '__main__':
 
     uid = "393361316"
@@ -70,4 +73,13 @@ if __name__ == '__main__':
     # tag2_data = user_data.query("tag==2")
     # print(tag2_data)
     # get_musicclass("316686",0,0,0)
-    download_user_music(uid)
+    # download_user_music(uid)
+    # save_mfcc(108242)
+    # x_predict =  music_classify.Read_list_x("E:\\musiclib\\mfcc\\108242.txt")
+    # print(x_predict)
+    sql = connect_sql.SQL()
+    song_ids  = sql.get_songtabel()
+    for i in tqdm(song_ids):
+        song_id = i[0]
+        save_predict(song_id)
+

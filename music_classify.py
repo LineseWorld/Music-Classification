@@ -60,7 +60,7 @@ def Save_list(list,filename):
     :param filename: 存储文件名
     :return:
     """
-    with open(filename + '.txt', 'w') as file:
+    with open(filename, 'w') as file:
         for i in range(len(list)):
             for j in range(len(list[i])):
                 file.write(str(list[i][j]))              # write函数不能写int类型的参数，所以使用str()转化
@@ -75,7 +75,7 @@ def Read_list_x(filename):
     :param filename:
     :return:
     """
-    file1 = open(filename+".txt", "r")
+    file1 = open(filename, "r")
     list_row =file1.readlines()
     list_source = []
     for i in range(len(list_row)):
@@ -94,7 +94,7 @@ def Read_list_y(filename):
     :param filename:
     :return:
     """
-    file1 = open(filename+".txt", "r")
+    file1 = open(filename, "r")
     list_row =file1.readlines()
     list_source = []
     for i in range(len(list_row)):
@@ -135,8 +135,8 @@ def save_feature():
             x_train.append(ar)
             y_train.append([genre_list.index(g)])
 
-    Save_list(x_train, "x_train")
-    Save_list(y_train, "y_train")
+    Save_list(x_train, "x_train.txt")
+    Save_list(y_train, "y_train.txt")
     print("特征保存成功")
 
 # 使用交叉验证和网格搜索寻找最优参数
@@ -409,8 +409,8 @@ def estimate_svm(x_test,y_test):
 #     print("交叉验证结果:\n", estimator.cv_results_)
 
 if __name__ == '__main__':
-    x_test = Read_list_x("x_train")
-    y_test = Read_list_y("y_train")
+    x_test = Read_list_x("x_train.txt")
+    y_test = Read_list_y("y_train.txt")
 
 
 
