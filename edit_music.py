@@ -63,7 +63,6 @@ def clip_lrc(filename,star,end):
     for key in Dict:
         if key <= end and key >= star:
             cliplrcs.append(Dict[key])
-        print(key,Dict[key])
     return cliplrcs
 
 # 将歌词文件写入词云文件
@@ -80,8 +79,9 @@ def write_to_file(lrcfile,start,end,writefile):
     with open(writefile, 'a', encoding='utf-8') as f:
         for mes in lrc:
             f.write(mes)
+        f.write("\n")
         f.close()
-    print(lrc)
+    # print(lrc)
 
 if __name__ == '__main__':
     # clip_music("wavfile/antique_music/0.wav","clip.wav",60,120)
