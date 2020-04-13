@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import random,connect_sql
-import pygal,jieba
+import pygal,jieba,pyecharts
 from imageio import imread
 from wordcloud import  WordCloud
 import PIL.Image as image
@@ -31,7 +31,16 @@ def pygal_bar_plays(plays,user_id,title="标题"):
     bar_chart.title = title
     bar_chart.add('user:'+str(user_id),plays)  # Add some values
 
-    file_name = "user_data/plays_" + str(user_id) + ".svg"
+    file_name = "user_data/plays_bar_" + str(user_id) + ".svg"
+    bar_chart.render_to_file(file_name)  # Save the svg to a file
+
+def pygal_bar_class(result,user_id,title="标题"):
+    bar_chart = pygal.Bar(print_values=True,print_values_position='top')  # Then create a bar graph object
+    bar_chart.x_labels = ["古风","古典","电子","民谣","流行","说唱","摇滚"]
+    bar_chart.title = title
+    bar_chart.add('',result)  # Add some values
+
+    file_name = "user_data/class_bar_" + str(user_id) + ".svg"
     bar_chart.render_to_file(file_name)  # Save the svg to a file
 
 
@@ -45,6 +54,22 @@ def pyga_pie_plays(plays,user_id,title="标题"):
     pie_chart.add('片段播放', data1)
     pie_chart.add('完整播放', data2)
     file_name = "user_data/plays_pie_" + str(user_id) + ".svg"
+    pie_chart.render_to_file(file_name)
+
+def pyga_pie_class(result,user_id,title="标题"):
+    pie_chart = pygal.Pie(inner_radius=.4)
+    pie_chart.title = title
+    data = []
+    sum = 0
+    for res in result:
+        sum+=res
+    for res in result:
+        data.append(round(res/sum,3))
+    tag = ["古风","古典","电子","民谣","流行","说唱","摇滚"]
+    for i in range(7):
+        pie_chart.add(tag[i], data[i])
+
+    file_name = "user_data/class_pie_" + str(user_id) + ".svg"
     pie_chart.render_to_file(file_name)
 
 # 描绘词云并保存
@@ -84,9 +109,6 @@ def draw_cloud(file_name,save_name,bg_name="source/bg2.png"):
         plt.imshow(wc, interpolation='bilinear')
         plt.axis('off')
         plt.show()
-
-
-
 
 
 

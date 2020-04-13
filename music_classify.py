@@ -28,7 +28,7 @@ def mp3_to_wav(file_name,save_name):
         sound.export(save_name,format ='wav')
         return True
     except Exception as msg:
-        print(msg)
+        print("vip特权")
         return False
 
 # 得到mfcc特征变换向量
@@ -166,8 +166,6 @@ def classify_mfcc():
             ar = get_mfcc_feature(g, n)
             x_train.append(ar)
             y_train.append(genre_list.index(g))
-
-
     x_test = []
     y_test = []
     print("===========")
@@ -262,151 +260,6 @@ def estimate_svm(x_test,y_test):
     score = estimator.score(x_test, y_test)
     print("准确率为：\n", score)
 
-# 其他音乐分类方法
-# def create_fit(g,n):
-#     """
-#     存储ftt特征矩阵
-#     :param g:
-#     :param n:
-#     :return:
-#     """
-#     path = "F:/genres/genres/"+g+"/"+g+"."+str(n).zfill(5)+".wav"
-#     # sample_rate:采样率，模数转换，X是音乐文件
-#     sample_rate, X = wavfile.read(path)
-#     # 用傅立叶变换处理1000HZ以下的数据
-#     fft_features = abs(fft(X)[:2000])
-#     sad = "trainset/"+g+"."+str(n).zfill(5)+".fft"
-#     np.save(sad,fft_features)
-#
-# def do_fft():
-#     """
-#     将wav文件做fft转换
-#     :return:
-#     """
-#     genre_list = ['blues','classcial','country','disco', 'rock','hiphop']
-#     for g in genre_list:
-#         for n in range(100):
-#             create_fit(g, n)
-#
-# def logic_Classify():
-#     """
-#     使用逻辑回归实现音乐分类器
-#     训练集数据来自generes 100首歌曲前30秒
-#     :return:
-#     """
-#     genre_list = ['blues', 'rock']
-#     x_train = []
-#     y_train = []
-#     # 前80做训练集
-#     for g in tqdm(genre_list):
-#         for n in range(90):
-#             path = "trainset/" + g + "." + str(n).zfill(5) + ".fft.npy"
-#             fft_features = np.load(path)
-#             x_train.append(fft_features)
-#             y_train.append(genre_list.index(g))
-#
-#     # 创建数组
-#     x_train = np.array(x_train)
-#     y_train = np.array(y_train)
-#
-#
-#     x_test = []
-#     y_test = []
-#     # 后20做测试集
-#     for g in tqdm(genre_list):
-#         for n in range(90, 100):
-#             path = "trainset/" + g + "." + str(n).zfill(5) + ".fft.npy"
-#             fft_features = np.load(path)
-#             x_test.append(fft_features)
-#             y_test.append(genre_list.index(g))
-#
-#     # 创建数组
-#     x_test = np.array(x_test)
-#     y_test = np.array(y_test)
-#
-#     # 训练
-#     # solver参数决定了我们对逻辑回归损失函数的优化方法
-#     # sag 随机平均梯度下降
-#     # multi_class OvR 多元逻辑回归看做二元逻辑回归
-#     estimator = LogisticRegression(solver='sag')
-#     estimator.fit(x_train, y_train)
-#
-#     # 模型评估
-#     # 直接比较
-#     y_predict = estimator.predict(x_test)
-#     print("y_predict:\n", y_predict)
-#     print("真实值和预测值：\n", y_test == y_predict)
-#     # 计算准确率
-#     score = estimator.score(x_test, y_test)
-#     print("准确率为：\n", score)
-#     print("训练评分：\n", estimator.score(x_train, y_train))
-#
-# def knn_Classify():
-#     """
-#     数据集为genres
-#     KNN算法实现音乐分类器 准确率较低
-#     :return:
-#     """
-#     genre_list = ['blues', 'rock']
-#     x_train = []
-#     y_train = []
-#     # 前90做训练集
-#     for g in tqdm(genre_list):
-#         for n in range(90):
-#             path = "trainset/" + g + "." + str(n).zfill(5) + ".fft.npy"
-#             fft_features = np.load(path)
-#             x_train.append(fft_features)
-#             y_train.append(genre_list.index(g))
-#
-#     # 创建数组
-#     x_train = np.array(x_train)
-#     y_train = np.array(y_train)
-#
-#     x_test = []
-#     y_test = []
-#     # 后10做测试集
-#     for g in tqdm(genre_list):
-#         for n in range(90, 100):
-#             path = "trainset/" + g + "." + str(n).zfill(5) + ".fft.npy"
-#             fft_features = np.load(path)
-#             x_test.append(fft_features)
-#             y_test.append(genre_list.index(g))
-#
-#     # 创建数组
-#     x_test = np.array(x_test)
-#     y_test = np.array(y_test)
-#
-#     # 特征工程
-#     transfer = StandardScaler()
-#     x_train = transfer.fit_transform(x_train)
-#     x_test = transfer.transform(x_test)
-#
-#     # KNN训练
-#     estimator = KNeighborsClassifier()
-#
-#     # 加入网格搜索和交叉验证
-#     # 参数准备
-#     param_dict = {"n_neighbors": [5, 7, 9,11,13,15]}
-#     estimator = GridSearchCV(estimator, param_grid=param_dict, cv=10)
-#     estimator.fit(x_train, y_train)
-#
-#     # 模型评估
-#     # 方法1 直接比较
-#     y_predict = estimator.predict(x_test)
-#     print("y_predict:\n", y_predict)
-#     print("真实值和预测值：\n", y_test == y_predict)
-#     # 方法2：计算准确率
-#     score = estimator.score(x_test, y_test)
-#     print("准确率为：\n", score)
-#
-#     # 最佳参数：best_params_
-#     print("最佳参数:\n", estimator.best_params_)
-#     # 最佳结果: best_score
-#     print("最佳结果:\n", estimator.best_score_)
-#     # 最佳估计器: best_estimator_
-#     print("最佳估计器:\n", estimator.best_estimator_)
-#     # 交叉验证结果 cv_results_
-#     print("交叉验证结果:\n", estimator.cv_results_)
 
 if __name__ == '__main__':
     x_test = Read_list_x("x_train.txt")
