@@ -262,6 +262,7 @@ def show_user_playhobby(user_id):
     playcounts = tag2_data[1]
 
     ct.draw_line_playhobby(playcounts,user_id,"片段播放习惯")
+    ct.draw_bar_plays(plays,user_id,"播放方式")
     # visualization.pygal_line_playhobby(playcounts,user_id,"播放片段")
     # visualization.pygal_bar_plays(plays,user_id,"听歌方式")
     # visualization.pyga_pie_plays(plays,user_id,"听歌方式比重")
