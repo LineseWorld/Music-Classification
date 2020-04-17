@@ -4,7 +4,7 @@ from pyecharts.charts import Line
 from pyecharts.charts import Pie
 import random
 # 柱状图
-def draw_bar_plays(plays,user_id,title="听歌方式"):
+def draw_bar_plays(data,user_id,title="听歌方式"):
     """
     两种听歌方式
     :param plays:
@@ -15,7 +15,7 @@ def draw_bar_plays(plays,user_id,title="听歌方式"):
     file_name = "user_data/" + str(user_id) + "_bar_plays.html"
     bar = Bar()
     bar.add_xaxis(["片段播放", "完整播放"])
-    bar.add_yaxis("用户:"+str(user_id), plays)
+    bar.add_yaxis("用户:"+str(user_id), data)
     # render 会生成本地 HTML 文件，默认会在当前目录生成 render.html 文件
     # 也可以传入路径参数，如 bar.render("mycharts.html")
     bar.set_global_opts(title_opts=opts.TitleOpts(title=title,pos_left="center"),
@@ -30,7 +30,7 @@ def draw_bar_plays(plays,user_id,title="听歌方式"):
 def draw_pie_recoder(data,user_id,title="用户行为占比"):
     """
     用户行为占比-未完成
-    :param plays:
+    :param data:
     :param user_id:
     :param title:
     :return:
@@ -55,9 +55,23 @@ def draw_pie_recoder(data,user_id,title="用户行为占比"):
     return c
 
 def draw_bar_recoder(data,user_id,title = "用户行为统计"):
-    return None
+    file_name = "user_data/" + str(user_id) + "_bar_recoder.html"
+    lable = ["循环播放","片段播放","查看评论","点赞评论","收藏歌曲"]
+    bar = Bar()
+    bar.add_xaxis(lable)
+    bar.add_yaxis("用户:" + str(user_id), data)
+    # render 会生成本地 HTML 文件，默认会在当前目录生成 render.html 文件
+    # 也可以传入路径参数，如 bar.render("mycharts.html")
+    bar.set_global_opts(title_opts=opts.TitleOpts(title=title, pos_left="center"),
+                        toolbox_opts=opts.ToolboxOpts(),
+                        legend_opts=opts.LegendOpts(is_show=False),
+                        yaxis_opts=opts.AxisOpts(name="次数"),
+                        # xaxis_opts=opts.AxisOpts(name="x"),
+                        )
+    bar.render(file_name)
+    return bar
 
-def draw_line_clip(playhobbys,user_id,title = "片段播放习惯"):
+def draw_line_clip(data,user_id,title = "片段播放习惯"):
     """
     片段播放习惯
     :param playhobbys:
@@ -77,7 +91,7 @@ def draw_line_clip(playhobbys,user_id,title = "片段播放习惯"):
             )
             .add_yaxis(
             "palycounts",
-            playhobbys,
+            data,
             symbol_size=0,
             label_opts=opts.LabelOpts(is_show=False),
             is_smooth=True
