@@ -107,26 +107,6 @@ def work_tag2_lrc(user_id,tag2_data):
         for i in range(times):
             edit_music.write_to_file(lrc_file, start_time, end_time, user_lrc_file)
 
-def show_user_cloud(user_id):
-    """
-    用户词云
-    :param user_id:
-    :return:
-    """
-    sql = connect_sql.SQL()
-    user_data = sql.get_recoder_byUid(user_id)
-    tag1_data = user_data.query("tag==1")
-    tag2_data = user_data.query("tag==2")
-    work_tag1_lrc(user_id, tag1_data)
-    work_tag2_lrc(user_id, tag2_data)
-    user_lrc_file = "user_data/cloud_" + str(user_id) + ".txt"
-    user_cloud_file = "user_data/cloud_" + str(user_id) + ".jpg"
-    visualization.draw_cloud(user_lrc_file,user_cloud_file)
-    # 数据清理
-    with open(user_lrc_file,'w',encoding='utf-8') as f:
-        f.write("")
-        f.close()
-
 def work_tag_plays(tag_data):
     """
     播放次数
@@ -148,6 +128,20 @@ def work_tag_plays(tag_data):
             for i in range(start_time,end_time):
                 ret[i]+=times
     return (cnt,ret)
+
+def work_tag_times(tag_data):
+    """
+    统计各类行为
+    :param tag_data:
+    :return:
+    """
+    data = tag_data.iloc[:, 2:7]
+    res = 0
+    for row in data.itertuples():
+        times = getattr(row, 'times')
+        res += times
+    return res
+
 
 def get_tag2_class(tag2_data):
     """
@@ -245,12 +239,35 @@ def get_class_other(tag_data):
 
     return result
 
+def show_user_cloud(user_id):
+    """
+    用户词云
+    :param user_id:
+    :return:
+    """
+    print("开始绘制用户词云")
+    sql = connect_sql.SQL()
+    user_data = sql.get_recoder_byUid(user_id)
+    tag1_data = user_data.query("tag==1")
+    tag2_data = user_data.query("tag==2")
+    work_tag1_lrc(user_id, tag1_data)
+    work_tag2_lrc(user_id, tag2_data)
+    user_lrc_file = "user_data/cloud_" + str(user_id) + ".txt"
+    user_cloud_file = "user_data/cloud_" + str(user_id) + ".jpg"
+    visualization.draw_cloud(user_lrc_file,user_cloud_file)
+    # 数据清理
+    with open(user_lrc_file,'w',encoding='utf-8') as f:
+        f.write("")
+        f.close()
+    print("完成词云绘制")
+
 def show_user_playhobby(user_id):
     """
     可视化播放习惯
     :param user_id:
     :return:
     """
+    print("开始绘制用户听歌习惯")
     sql = connect_sql.SQL()
     user_data = sql.get_recoder_byUid(user_id)
     tag1_data = user_data.query("tag==1")
@@ -261,17 +278,20 @@ def show_user_playhobby(user_id):
     plays = [tag2_data[0],tag1_data[0]]
     playcounts = tag2_data[1]
 
-    ct.draw_line_playhobby(playcounts,user_id,"片段播放习惯")
-    ct.draw_bar_plays(plays,user_id,"播放方式")
     # visualization.pygal_line_playhobby(playcounts,user_id,"播放片段")
     # visualization.pygal_bar_plays(plays,user_id,"听歌方式")
     # visualization.pyga_pie_plays(plays,user_id,"听歌方式比重")
+    ct.draw_line_clip(playcounts,user_id,"片段播放习惯")
+    ct.draw_bar_plays(plays,user_id,"播放方式")
+    print("完成播放方式绘制")
+
 
 def show_user_class(user_id):
     """
     歌曲类别比重绘制
     :return:
     """
+    print("开始绘制用户曲风偏爱")
     sql = connect_sql.SQL()
     user_data = sql.get_recoder_byUid(user_id)
     tag1_data = user_data.query("tag==1")  # 单曲循环
@@ -297,36 +317,49 @@ def show_user_class(user_id):
         data.append((lable[i],result[i]))
     # visualization.pyga_pie_class(result,user_id,"曲风偏爱比重")
     # visualization.pygal_bar_class(result,user_id,"收听曲风数据")
-    ct.draw_pie_hobby(data,user_id,"曲风偏爱比重")
+    ct.draw_pie_like(data,user_id)
+    ct.draw_bar_like(data,user_id)
+    print("完成曲风比重绘制")
 
-def show_user_data(user_id):
+def show_user_reconder(user_id):
+    """
+    行为占比绘制
+    :param user_id:
+    :return:
+    """
+    print("开始用户行为可视化")
+    data = []
+    lable = ["循环播放","片段播放","查看评论","点赞评论","收藏歌曲"]
     sql = connect_sql.SQL()
     user_data = sql.get_recoder_byUid(user_id)
-    tag1_data = user_data.query("tag==1") # 单曲循环
-    tag2_data = user_data.query("tag==2") # 片段播放
-    tag3_data = user_data.query("tag==3") # 评论时长+次数
-    tag4_data = user_data.query("tag==4") # 点赞评论
-    tag5_data = user_data.query("tag==5") # 收藏歌曲
-    show_user_cloud(user_id)
+    tag1_data = user_data.query("tag==1")  # 单曲循环
+    data.append((lable[0],work_tag_times(tag1_data)))
+    tag2_data = user_data.query("tag==2")  # 片段播放
+    data.append((lable[1], work_tag_times(tag2_data)))
+    tag3_data = user_data.query("tag==3")  # 评论时长+次数
+    data.append((lable[2], work_tag_times(tag3_data)))
+    tag4_data = user_data.query("tag==4")  # 点赞评论
+    data.append((lable[3], work_tag_times(tag4_data)))
+    tag5_data = user_data.query("tag==5")  # 收藏歌曲
+    data.append((lable[4], work_tag_times(tag5_data)/10))
+    ct.draw_bar_recoder(data,user_id)
+    ct.draw_pie_recoder(data,user_id)
+    print("完成行为可视化")
+
 
 
 if __name__ == '__main__':
     uid = "393361316"
-    # show_user_playhobby(uid)
+    # 代码一：词云绘制
+    show_user_cloud(uid)
+
+    # 代码二：偏爱绘制
     show_user_class(uid)
-    # user_data = sql.get_recoder_byUid(uid)
-    # tag1_data = user_data.query("tag==1")
-    # tag2_data = user_data.query("tag==2")
-    # print(tag2_data)
-    # get_musicclass("316686",0,0,0)
-    # download_user_music(uid)
-    # save_mfcc(108242)
-    # x_predict =  music_classify.Read_list_x("E:\\musiclib\\mfcc\\108242.txt")
-    # print(x_predict)
-    # sql = connect_sql.SQL()
-    # song_ids  = sql.get_songtabel()
-    # for i in tqdm(song_ids):
-    #     song_id = i[0]
-    #     save_predict(song_id)
-    # show_user_data(393361316)
+
+    # 代码三：方式绘制
+    show_user_playhobby(uid)
+
+    # 代码四：行为可视化
+    show_user_reconder(uid)
+
 
