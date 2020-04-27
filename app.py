@@ -346,20 +346,76 @@ def show_user_reconder(user_id):
     ct.draw_pie_recoder(data,user_id)
     print("完成行为可视化")
 
+def process_data(user_id):
+    data_set = []
+    sql = connect_sql.SQL()
+    user_data = sql.get_recoder_byUid(user_id)
+    tag_data = [0]
+    for i in range(1,6):
+        tag_data.append(user_data.query("tag=="+str(i)))
+
+    # 行为统计
+    data = []
+    lable = [" ","循环播放","片段播放","查看评论","点赞评论","收藏歌曲"]
+    for i in range(1,6):
+        tmp = work_tag_times(tag_data[i])
+        if i == 5:
+            tmp = tmp/10
+        data.append((lable[i],tmp))
+    data_set.append(data)
+
+    # 偏爱统计
+    res = []
+    for i in range(1,6):
+        if i != 2:
+            res.append(get_class_other(tag_data[i]))
+        else:
+            res.append(get_tag2_class(tag_data[i]))
+    result = [0, 0, 0, 0, 0, 0, 0]
+    for item in res:
+        for i in range(0, 7):
+            result[i] += item[i]
+    for i in range(0, 7):
+        result[i] = round(result[i], 2)
+    lable = ["古风", "古典", "电子", "民谣", "流行", "说唱", "摇滚"]
+    data = []
+    for i in range(0, 7):
+        data.append((lable[i], result[i]))
+    data_set.append(data)
+
+    # 播放方式统计
+    tag1_data = work_tag_plays(tag_data[1])
+    tag2_data = work_tag_plays(tag_data[2])
+    # 播放方式
+    data = [tag2_data[0], tag1_data[0]]
+    data_set.append(data)
+    # 片段频率统计
+    data = tag2_data[1]
+    data_set.append(data)
+
+    return data_set
+
 
 
 if __name__ == '__main__':
     uid = "393361316"
-    # 代码一：词云绘制
-    show_user_cloud(uid)
+    data_set = process_data(uid)
+    ct.user_tab(data_set,uid)
 
-    # 代码二：偏爱绘制
-    show_user_class(uid)
-
-    # 代码三：方式绘制
-    show_user_playhobby(uid)
-
-    # 代码四：行为可视化
-    show_user_reconder(uid)
-
+    # # 代码一：词云绘制
+    # show_user_cloud(uid)
+    #
+    # # 代码二：偏爱绘制
+    # show_user_class(uid)
+    #
+    # # 代码三：方式绘制
+    # show_user_playhobby(uid)
+    #
+    # # 代码四：行为可视化
+    # show_user_reconder(uid)
+    # tag1_data = user_data.query("tag==1")  # 单曲循环
+    # tag2_data = user_data.query("tag==2")  # 片段播放
+    # tag3_data = user_data.query("tag==3")  # 评论时长+次数
+    # tag4_data = user_data.query("tag==4")  # 点赞评论
+    # tag5_data = user_data.query("tag==5")  # 收藏歌曲
 
