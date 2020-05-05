@@ -106,9 +106,9 @@ def draw_cloud(file_name,save_name,bg_name="source/bg2.png"):
         wc = cloud.generate(cut_text)
         wc.to_file(save_name)  # 保存图片
         # 显示词云
-        plt.imshow(wc, interpolation='bilinear')
-        plt.axis('off')
-        plt.show()
+        # plt.imshow(wc, interpolation='bilinear')
+        # plt.axis('off')
+        # plt.show()
 
 
 

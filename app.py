@@ -253,7 +253,7 @@ def show_user_cloud(user_id):
     work_tag1_lrc(user_id, tag1_data)
     work_tag2_lrc(user_id, tag2_data)
     user_lrc_file = "user_data/cloud_" + str(user_id) + ".txt"
-    user_cloud_file = "user_data/cloud_" + str(user_id) + ".jpg"
+    user_cloud_file = "cloud_" + str(user_id) + ".jpg"
     visualization.draw_cloud(user_lrc_file,user_cloud_file)
     # 数据清理
     with open(user_lrc_file,'w',encoding='utf-8') as f:
@@ -394,6 +394,7 @@ def process_data(user_id):
     data_set.append(data)
 
     return data_set
+
 
 
 

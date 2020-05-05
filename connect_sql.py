@@ -46,13 +46,13 @@ class SQL():
         db = pymysql.connect(self.address, self.user, self.password, self.db_name,charset='utf8')
         # 插入一条记录
         ss = "("
-        for i in range(0,7):
+        for i in range(0,8):
             ss=ss + "\'"+str(values[i])+"\'"
-            if i == 6:
+            if i == 7:
                 ss=ss+")"
             else:
                 ss=ss+","
-        sql = "insert ignore into recoder(user_id,song_id,tag,start_time,end_time,times,message) " \
+        sql = "insert ignore into recoder(user_id,song_id,tag,start_time,end_time,times,message,inserttime) " \
               " values "+ss
 
         # 接着我们获取 cursor 来操作我们的 pytest 这个数据库

@@ -206,9 +206,21 @@ def get_user_recoder(uid,n,type):
     return user_recoder
 
 
+def judge_user(user_name,user_pwd):
+    url = "http://localhost:3000/login/cellphone?phone="+str(user_name)+"&password="+str(user_pwd)
+    html = requests.get(url).text
+    dits = eval(html)
+    code = dits["code"]
+    if code != 200:
+        return None
+    else:
+        account = dits["account"]
+        user_id = account["id"]
+        return user_id
+
 if __name__ == '__main__':
     print("crawl_song")
-
+    #print(judge_user(15960592913,"lsj12"))
 
 
 
