@@ -1,6 +1,7 @@
 import pymysql
 import pandas as pd
 from sqlalchemy import create_engine
+import time
 class SQL():
     # 初始化信息
     def __init__(self):
@@ -90,6 +91,62 @@ class SQL():
         # 关闭数据库连接
         db.close()
 
+    def judge_user(self,user_id):
+        db = pymysql.connect(self.address, self.user, self.password, self.db_name, charset='utf8')
+        sql = "select 1 from users where user_id = \'" + str(user_id) + "\' limit 1;"
+        cursor = db.cursor()
+        try:
+            # 执行SQL语句
+            cursor.execute(sql)
+            # 获取所有记录列表
+            results = cursor.fetchone()
+            return results
+        except:
+            print("Error: unable to fecth data")
+        # 关闭数据库连接
+        db.close()
+
+    def get_user(self,user_id):
+        db = pymysql.connect(self.address, self.user, self.password, self.db_name, charset='utf8')
+        sql = "select * from users where user_id=" + "\'" + str(user_id) + "\'"
+        result = pd.read_sql_query(sql, con=db)
+        # print(result)
+        return result
+
+    def insert_user(self,user_id):
+        db = pymysql.connect(self.address, self.user, self.password, self.db_name, charset='utf8')
+        datetime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        ss = "(\'"+str(user_id)+"\', \'"+str(datetime)+"\')"
+        sql = "insert ignore into users (user_id,lasttime) " \
+              " values " + ss
+
+        cursor = db.cursor()
+        cursor.execute(sql)
+        db.commit()
+        print("成功插入数据")
+        db.close()
+
+
+    def update_user(self,user_id,values):
+        db = pymysql.connect(self.address, self.user, self.password, self.db_name, charset='utf8')
+        # 插入一条记录
+        sql = "UPDATE users SET antique = %s ,classical = %s , electronic = %s , folk = %s , pop = %s , rap = %s , rock = %s , " \
+              "lasttime = %s , songs= %s" \
+              " WHERE user_id = "+str(user_id)
+        val = tuple(values)
+
+        cursor = db.cursor()
+        cursor.execute(sql,val)
+        db.commit()
+        print("成功插入数据")
+        db.close()
+
+    def get_recoder_bydatetime(self,user_id,lasttime):
+        db = pymysql.connect(self.address, self.user, self.password, self.db_name, charset='utf8')
+        sql = "select * from recoder where user_id =" + "\'" + str(user_id) + "\' and inserttime < \'"+str(lasttime)+"\'"
+        result = pd.read_sql_query(sql, con=db)
+        # print(result)
+        return result
 
     # 判断歌曲库中是否存在
     def judgesong(self,song_id):
@@ -109,5 +166,12 @@ class SQL():
 
 if __name__ == '__main__':
     sql = SQL()
-    print(sql.get_songtabel())
-
+    # print(sql.get_songtabel())
+    # sql.insert_user("13131")
+    # print(sql.get_user("13131"))
+    # datetime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    # values = [1.0,2.0,3.0,4.0,5.0,7.0,8.0,datetime,100]
+    # sql.update_user("13131",values)
+    # print(sql.get_user("13131"))
+    # lasttime = "2020-05-05 22:03:44"
+    # print(sql.get_recoder_bydatetime("393361316",lasttime))

@@ -1,6 +1,6 @@
 import connect_sql,crawl_song,\
     edit_music,music_classify,visualization
-import joblib
+import joblib,time
 from tqdm import tqdm
 import charts_tool as ct
 # uid = 393361316
@@ -395,14 +395,120 @@ def process_data(user_id):
 
     return data_set
 
+def update_user_message(user_id):
+    sql = connect_sql.SQL()
+    user_data = sql.get_user(user_id)
+    user_data = user_data.iloc[:, :]
+    lable = ["antique","classical","electronic","folk","pop","rap","rock"]
+    update_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
+    valuse = []
+    for row in user_data.itertuples():
+        for item in lable:
+            valuse.append(getattr(row,item))
+
+    valuse.append(update_time)
+    for row in user_data.itertuples():
+        valuse.append(getattr(row,"songs"))
+
+
+    # print(user_data)
+    lasttime = getattr(user_data,"lasttime")
+    # print(lasttime)
+    new_recoder = sql.get_recoder_bydatetime(user_id,lasttime)
+    print(new_recoder)
+    tag_data = [0]
+    for i in range(1, 6):
+        tag_data.append(new_recoder.query("tag==" + str(i)))
+
+    # print(new_recoder)
+    # 新纪录 音乐分类 更新到原有的 values
+    # 偏爱统计
+    res = []
+    for i in range(1, 6):
+        if i != 2:
+            res.append(get_class_other(tag_data[i]))
+        else:
+            res.append(get_tag2_class(tag_data[i]))
+    result = [0, 0, 0, 0, 0, 0, 0]
+    for item in res:
+        for i in range(0, 7):
+            result[i] += item[i]
+    for i in range(0, 7):
+        result[i] = round(result[i], 2)
+    lable = ["古风", "古典", "电子", "民谣", "流行", "说唱", "摇滚"]
+    data = []
+    for i in range(0,7):
+        all=float(result[i])+float(valuse[i])
+        valuse[i] = all
+        data.append((lable[i], all))
+
+    valuse[8]=update_cloud(user_id,valuse[8],tag_data[1],tag_data[2])
+    sql.update_user(user_id,valuse)
+    return data
+
+def update_cloud(user_id,songs,tag1_data,tag2_data):
+    print("---词云更新---")
+    new_times = work_tag_times(tag1_data)+work_tag_times(tag2_data)
+    print("new_times:", new_times, " songs: ", songs)
+    if songs == 0:
+        show_user_cloud(user_id)
+        return new_times + songs
+    elif new_times/songs >= 0.1:
+        show_user_cloud(user_id)
+        return new_times+songs
+    else:
+        print("数据太小不更新")
+        return songs
+        # 不更新
+
+
+
+def process_data2(user_id):
+    data_set = []
+    sql = connect_sql.SQL()
+    user_data = sql.get_recoder_byUid(user_id)
+    tag_data = [0]
+    for i in range(1,6):
+        tag_data.append(user_data.query("tag=="+str(i)))
+
+    # 行为统计
+    data = []
+    lable = [" ","循环播放","片段播放","查看评论","点赞评论","收藏歌曲"]
+    for i in range(1,6):
+        tmp = work_tag_times(tag_data[i])
+        if i == 5:
+            tmp = tmp/10
+        data.append((lable[i],tmp))
+    data_set.append(data)
+
+    # 偏爱统计
+    data = update_user_message(user_id)
+    data_set.append(data)
+
+    # 播放方式统计
+    tag1_data = work_tag_plays(tag_data[1])
+    tag2_data = work_tag_plays(tag_data[2])
+    # 播放方式
+    data = [tag2_data[0], tag1_data[0]]
+    data_set.append(data)
+    # 片段频率统计
+    data = tag2_data[1]
+    data_set.append(data)
+
+    return data_set
 
 
 if __name__ == '__main__':
     uid = "393361316"
-    data_set = process_data(uid)
+    #data = update_user_message(uid)
+    data_set = process_data2(uid)
+    print(data_set)
+    all = float(13)
+    print(all)
     ct.user_tab(data_set,uid)
-
+    # update_user_message(uid)
+    # show_user_cloud(uid)
     # # 代码一：词云绘制
     # show_user_cloud(uid)
     #

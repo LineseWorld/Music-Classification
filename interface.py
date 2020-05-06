@@ -1,4 +1,4 @@
-import sys
+import sys,app
 import os
 import tkinter as tk
 from crawl_song import judge_user
@@ -78,7 +78,8 @@ def window2(user_id):
 
 
     def usr_update():
-        pass
+        app.update_user_message(user_id)
+        tk.messagebox.showinfo(title='提示', message='更新成功')
 
 
     def tag2():
@@ -276,7 +277,13 @@ def window2(user_id):
         btn_tag = tk.Button(window_tag, text='收藏', command=insert_op)
         btn_tag.place(x=150, y=50)
 
-    #登录 注册按钮
+    def usr_quit():
+        window.destroy()
+        print("退出程序后更新数据")
+        app.update_user_message(user_id)
+        window1()
+
+
     bt_show=tk.Button(window,text='  数据可视化 ',command=usr_show)
     bt_show.place(x=10,y=60)
 
@@ -298,6 +305,9 @@ def window2(user_id):
 
     bt_tag5 = tk.Button(window, text='录入收藏歌曲行为', command=tag5)
     bt_tag5.place(x=240, y=140)
+
+    bt_quit = tk.Button(window, text='退出登陆', command=usr_quit)
+    bt_quit.place(x=360, y=160)
 
     #主循环
     window.mainloop()
